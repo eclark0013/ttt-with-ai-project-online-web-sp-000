@@ -2,9 +2,25 @@ module Players # start 1
   class Computer < Player # start 2
     attr_accessor :return_num, :potential_winner, :potential_loser
 
-    def random # start 4
-      rand(1..9)
+    def random(board) # start 4
+      available = (0..8).to_a.select {|num| board.cells[num] == " "}
+      available[rand(available.length)] + 1
     end # end 4 module #random
+
+    def take_a_corner(board)
+      if board.cells[0] == " " # take a corner
+        @return_num = 1
+      elsif board.cells[2] == " "
+        @return_num = 3
+      elsif board.cells[6] == " "
+        @return_num = 7
+      elsif board.cells[8] == " "
+        @return_num = 9
+      else
+        @return_num = random(board)
+      end
+    end
+
 
     def move(board) # start 3
       @potential_winner = nil
@@ -31,7 +47,7 @@ module Players # start 1
         one_blank = victory_combinations.select {|combo| combo.count{|num| board.cells[num] == " "} == 1}
 
         if one_blank == [] # start conditional based on return value of one_blank
-          @return_num = random
+          take_a_corner(board)
         # below code is to take my winning spot
         else
           @potential_winner = one_blank.detect {|combo| combo.count{|cell| board.cells[cell] == my_tok} == 2}
@@ -41,7 +57,7 @@ module Players # start 1
           elsif @potential_loser != nil
             @return_num = @potential_loser.detect {|cell| board.cells[cell] == " "} + 1
           else
-            @return_num = random
+            take_a_corner(board)
           end # end conditional which returns the number of the blank spot in a potential winner first, loser second
         end # end the conditional based on the return value of one_blank
 
